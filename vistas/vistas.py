@@ -1,4 +1,5 @@
 
+from datetime import datetime
 from time import sleep
 from wsgiref import validate
 from flask import request
@@ -9,53 +10,54 @@ import requests
 import time
 import json
 
-from modelos import db, Usuario, UsuarioSchema
-   
-usuario_schema = UsuarioSchema()
+from modelos import db, User, UserSchema
+from modelos.modelos import Status, TaskSchema, Task
+
+user_schema = UserSchema()
+task_schema = TaskSchema()
 
 
-class VistaSignIn(Resource):
+class VistaSignUp(Resource):
 
     def post(self):
 
-        usuario = Usuario.query.filter(
-            Usuario.usuario == request.json["usuario"]).first()
-        if not usuario is None:
+        user = User.query.filter(
+            User.username == request.json["username"]).first()
+        if not user is None:
             return "No se puede crear el Apostador. El usuario ya existe", 409
 
-        nuevo_usuario = Usuario(usuario=request.json["usuario"], contrasena=request.json["contrasena"])
-        db.session.add(nuevo_usuario)
+        new_user = User(
+            username=request.json["username"], password=request.json["password"])
+        db.session.add(new_user)
         db.session.commit()
-        token_de_acceso = create_access_token(identity=nuevo_usuario.id)
-        return {"mensaje": "usuario creado exitosamente", "token": token_de_acceso, "id": nuevo_usuario.id}
-
-    def put(self, id_usuario):
-        usuario = Usuario.query.get_or_404(id_usuario)
-        usuario.contrasena = request.json.get("contrasena", usuario.contrasena)
-        db.session.commit()
-        return usuario_schema.dump(usuario)
-
-    def delete(self, id_usuario):
-        usuario = Usuario.query.get_or_404(id_usuario)
-        db.session.delete(usuario)
-        db.session.commit()
-        return '', 204
+        token_de_acceso = create_access_token(identity=user.id)
+        return {"mensaje": "usuario creado exitosamente", "token": token_de_acceso, "id": new_user.id}
 
 
 class VistaLogIn(Resource):
 
     def post(self):
-        nombreUsuario = ""
-        apostadorId = ""
-        usuario = Usuario.query.filter(Usuario.usuario == request.json["usuario"],
-                                       Usuario.contrasena == request.json["contrasena"]).first()
+        user = User.query.filter(User.username == request.json["username"],
+                                 User.password == request.json["password"]).first()
         db.session.commit()
 
-        if usuario is None:
+        if user is None:
             return "El usuario no existe", 404
-            
-        token_de_acceso = create_access_token(identity=usuario.id)
+
+        token_de_acceso = create_access_token(identity=user.id)
         return {"mensaje": "Inicio de sesión exitoso", "token": token_de_acceso,
-                "nombreUsuario": nombreUsuario, "apostadorId": apostadorId}
+                "User": user.username}
 
 
+class VistaTasks(Resource):
+
+    def post(self):
+        # File file = request.json["fileName"]
+        originalFormat = [
+            value for value in request.json["fileName"].split(".")][-1]
+        task = Task(fileName=request.json["fileName"], originalFormat=originalFormat,
+                    newFormat=request.json["newFormat"], status=Status.UPLOADED, date=datetime.now())
+        db.session.add(task)
+        db.session.commit()
+
+        return "La tarea fue creada correctamente"

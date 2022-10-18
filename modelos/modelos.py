@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 import enum
 from flask_sqlalchemy import SQLAlchemy
@@ -16,14 +17,15 @@ class User(db.Model):
 
 class Status(Enum):
     UPLOADED = 1
-    PROCESSED = 1
+    PROCESSED = 2
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    fileName = db.Column(db.String(100))
     originalFormat = db.Column(db.String(3))
     newFormat = db.Column(db.String(3))
     status = Status
-    date = db.Column(db.DateTime())
+    date = db.Column(db.DateTime(), default=datetime.now())
 
 class UserSchema(SQLAlchemyAutoSchema):
     class Meta:
