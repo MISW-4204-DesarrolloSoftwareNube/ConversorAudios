@@ -15,7 +15,7 @@ class User(db.Model):
     password = db.Column(db.String(50))
     mail = db.Column(db.String(50))
 
-class Status(Enum):
+class Status(enum.IntEnum):
     UPLOADED = 1
     PROCESSED = 2
 
@@ -24,7 +24,7 @@ class Task(db.Model):
     fileName = db.Column(db.String(100))
     originalFormat = db.Column(db.String(3))
     newFormat = db.Column(db.String(3))
-    status = Status
+    status = db.Column(db.Enum(Status))
     date = db.Column(db.DateTime(), default=datetime.now())
 
 class UserSchema(SQLAlchemyAutoSchema):

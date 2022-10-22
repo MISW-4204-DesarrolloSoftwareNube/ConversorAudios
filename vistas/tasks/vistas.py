@@ -28,3 +28,7 @@ class VistaTasks(Resource):
         db.session.commit()
 
         return "La tarea fue creada correctamente"
+
+    @jwt_required()
+    def get(self):
+        return [task_schema.dump(ca) for ca in Task.query.all()]
