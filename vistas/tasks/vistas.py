@@ -32,3 +32,9 @@ class VistaTasks(Resource):
     @jwt_required()
     def get(self):
         return [task_schema.dump(ca) for ca in Task.query.all()]
+
+class VistaTask(Resource):
+    
+    @jwt_required()
+    def get(self, id):
+        return task_schema.dump(Task.query.get_or_404(id))
