@@ -4,8 +4,8 @@ from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
 from modelos import db
-from vistas.tasks import VistaTasks, VistaTask
-from vistas.users import VistaLogIn, VistaSignUp,VistaFileProcessedByUser 
+from vistas.tasks import VistaTasks, VistaTask, VistaFileProcessedByUser
+from vistas.users import VistaLogIn, VistaSignUp 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///conversorAudios.db'

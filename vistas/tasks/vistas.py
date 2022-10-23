@@ -85,3 +85,34 @@ class VistaTask(Resource):
         else:
             return "Este archivo no se ha procesado"
 
+class VistaFileProcessedByUser(Resource):
+    @jwt_required()
+    def get(self, id_user):
+        
+        userTasks = Task.query.filter_by(usuario_id=id_user).all()
+
+        updatedFiles = []
+        processedFiles = []
+
+
+        dictFiles = {
+            "listFilesUploaded": [],
+            "listFilesProcessed":[]
+        }
+
+        if userTasks:
+
+            for userTask in userTasks:
+                if userTask.status == 1:
+                    dictFiles["listFilesUploaded"].append(userTask.fileName)
+                    # updatedFiles.append(userTask.fileName)
+                    # print("Su archivo Original es : ",userTask.fileName)
+                if userTask.status == 2:
+                    dictFiles["listFilesProcessed"].append(userTask.fileName)
+
+            print("El el usuario tiene los siguientes archivos : ", dictFiles)
+           
+            return json.dumps(dictFiles)
+
+        else:
+            return "El usuario no tiene documentos almacenados", 404
