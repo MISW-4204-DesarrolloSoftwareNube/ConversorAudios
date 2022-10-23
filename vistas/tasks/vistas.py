@@ -141,7 +141,5 @@ class VistaDeleteFile(Resource):
                 return "El id {} de la tarea, NO existe para el usuario {}".format(id_tarea,user_id)
         else:
             return "El usuario NO tiene tareas creadas", 404
-
-
         
 
