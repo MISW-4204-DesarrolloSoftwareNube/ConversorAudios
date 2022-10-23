@@ -33,37 +33,45 @@ class VistaTasks(Resource):
     def get(self):
         return [task_schema.dump(ca) for ca in Task.query.all()]
 
-    @jwt_required()
-    def put(self):
-        #obtener archivo
-
-        filenam = "nombrearchivo.mp3"
-        task = Task.query.get_or_404(filenam)
-        
-        if task.status == "PROCESSED":
-
-            nombresolo = filenam.split(".")[0]
-            formato = request.json["newFormat"]
-            nuevonombre = nombresolo+"."+formato
-
-            task.fileName=nuevonombre
-            task.newFormat=request.json["newFormat"]
-            task.status=Status.UPLOADED
-            task.date=datetime.now()
-            db.session.commit()
-
-            #convertir archivo
-
-            task.status=Status.PROCESSED 
-            task.date=datetime.now()
-            db.session.commit()
-
-            #eliminar archivo anterior convertido
-
-        return "El archivo fue modificado correctamente"
 
 class VistaTask(Resource):
     
     @jwt_required()
     def get(self, id):
         return task_schema.dump(Task.query.get_or_404(id))
+
+    @jwt_required()
+    def put(self, id):
+        #obtener archivo
+
+        oldname = "nombrearchivo.mp3"
+        task = Task.query.get_or_404(id)
+        
+        if task.status == "PROCESSED":
+
+            nombresolo = oldname.split(".")[0]
+            format = request.json["newFormat"]
+            newname = nombresolo+"."+format
+
+            task.status=Status.UPLOADED
+            db.session.commit()
+
+            #convertir archivo
+            # src = oldname
+            # dst = newname
+                                                          
+            # sound = AudioSegment.from_mp3(src)
+            # sound.export(dst, format="wav")
+
+            task.fileName=newname
+            task.newFormat=request.json["newFormat"]
+            task.status=Status.PROCESSED 
+            task.date=datetime.now()
+            db.session.commit()
+
+            #eliminar archivo anterior convertido
+        
+            return "El archivo fue modificado correctamente"
+
+        else:
+            return "Este archivo no se ha procesado"
