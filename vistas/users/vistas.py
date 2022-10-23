@@ -44,3 +44,8 @@ class VistaLogIn(Resource):
         token_de_acceso = create_access_token(identity=user.id)
         return {"mensaje": "Inicio de sesión exitoso", "token": token_de_acceso,
                 "User": user.username}
+
+class VistaFileProcessedByUser(Resource):
+    @jwt_required()
+    def get(self, id_user):
+        return user_schema.dump(User.query.get_or_404(id_user))
