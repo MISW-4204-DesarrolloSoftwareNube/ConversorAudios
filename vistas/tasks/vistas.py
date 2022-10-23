@@ -68,9 +68,8 @@ class VistaTask(Resource):
             oldnewname = nombresolo+"."+oldnewformat
             newname = nombresolo+"."+newformat
 
-            # task.status=Status.UPLOADED
-            # db.session.commit()
-            
+            task.status=Status.UPLOADED
+            db.session.commit()
             #obtener archivo
             songs = glob.glob("*."+oldnewformat)
             print(songs)
@@ -86,17 +85,21 @@ class VistaTask(Resource):
 
                     print(song," y ",dst)
 
-                    absolute_path = os.path.dirname(__file__)
-                    print(absolute_path)
+                    # absolute_path = os.path.dirname(__file__)
+                    # print(absolute_path)
+
+                    # p = open("audio.mp3")
+                    # print("hola",p.re)
                                     
-                    #sound = AudioSegment.from_file(absolute_path+"\\audio.mp3", format=oldnewformat)
+                    #sound = AudioSegment.from_file(absolute_path+"\\"+song, format=oldnewformat)
+                    #sound = AudioSegment.from_mp3(absolute_path+"\\audio.mp3")
                     #print(sound)
                     #sound.export(dst, format=newformat)
 
-                    # task.newFormat=request.json["newFormat"]
-                    # task.status=Status.PROCESSED 
-                    # task.date=datetime.now()
-                    # db.session.commit()
+                    task.newFormat=request.form.get("newFormat")
+                    task.status=Status.PROCESSED 
+                    task.date=datetime.now()
+                    db.session.commit()
 
                 #eliminar archivo anterior convertido
 
