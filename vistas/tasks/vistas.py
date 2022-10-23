@@ -1,5 +1,7 @@
 
 from datetime import datetime
+import os
+import os.path
 from time import sleep
 from wsgiref import validate
 from flask import request
@@ -15,17 +17,24 @@ from modelos.modelos import Status, TaskSchema, Task
 
 task_schema = TaskSchema()
 
+
 class VistaTasks(Resource):
 
+    #@jwt_required
     def post(self):
-        # File file = request.json["fileName"]
-        print(request.form.get(""))
+        fileName = request.files['fileName'].filename
         originalFormat = [
-            value for value in request.json["fileName"].split(".")][-1]
-        task = Task(fileName=request.json["fileName"], originalFormat=originalFormat,
-                    newFormat=request.json["newFormat"], status=Status.UPLOADED, date=datetime.now())
+            value for value in fileName.split(".")][-1]
+        name = [
+            value for value in fileName.split(".")][1]
+        task = Task(fileName=fileName, originalFormat=originalFormat,
+                    newFormat=request.form.get("newFormat"), status=Status.UPLOADED, date=datetime.now())
         db.session.add(task)
         db.session.commit()
+
+        dir_name = 'C:\\Users\\USER\\Documents\\'
+        f = request.files['fileName']
+        f.save(os.path.join(dir_name, name + '-' + str(task.id) + '.' + originalFormat))
 
         return "La tarea fue creada correctamente"
 
