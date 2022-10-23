@@ -5,7 +5,8 @@ import os.path
 from time import sleep
 from wsgiref import validate
 from flask import request
-from flask_jwt_extended import jwt_required, create_access_token
+from flask_jwt_extended import jwt_required, create_access_token,get_jwt
+import jwt
 from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
 import requests
@@ -105,14 +106,42 @@ class VistaFileProcessedByUser(Resource):
             for userTask in userTasks:
                 if userTask.status == 1:
                     dictFiles["listFilesUploaded"].append(userTask.fileName)
-                    # updatedFiles.append(userTask.fileName)
-                    # print("Su archivo Original es : ",userTask.fileName)
                 if userTask.status == 2:
                     dictFiles["listFilesProcessed"].append(userTask.fileName)
-
-            print("El el usuario tiene los siguientes archivos : ", dictFiles)
            
             return json.dumps(dictFiles)
 
         else:
             return "El usuario no tiene documentos almacenados", 404
+
+class VistaDeleteFile(Resource):
+    @jwt_required()
+    def delete(self):
+
+        id_tarea = request.json["id_tarea"]
+
+        strJwtRequest = request.headers['Authorization']
+        parseJtwData = strJwtRequest[7:]
+
+        jwtDecoded = jwt.decode(parseJtwData, options={"verify_signature": False})
+        user_id = jwtDecoded['sub']
+
+        userTasks = Task.query.filter_by(usuario_id=user_id).all()
+
+        if userTasks:            
+            userTask = Task.query.filter_by(id=id_tarea).first()
+            if userTask:
+                if userTask.status==2:        
+                    db.session.delete(userTask)
+                    db.session.commit()
+                    return 'Tarea eliminada con exito', 202
+                else:
+                    return 'La tarea no tiene estado PROCESSED', 404                
+            else:
+                return "El id {} de la tarea, NO existe para el usuario {}".format(id_tarea,user_id)
+        else:
+            return "El usuario NO tiene tareas creadas", 404
+
+
+        
+
