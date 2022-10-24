@@ -151,30 +151,33 @@ class VistaTask(Resource):
 
 class VistaFileProcessedByUser(Resource):
     @jwt_required()
-    def get(self, id_user):
+    def get(self, _filename):
 
-        userTasks = Task.query.filter_by(usuario_id=id_user).all()
 
-        updatedFiles = []
-        processedFiles = []
+        strJwtRequest = request.headers['Authorization']
+        parseJtwData = strJwtRequest[7:]
+
+        jwtDecoded = jwt.decode(parseJtwData, options={
+                                "verify_signature": False})
+        user_id = jwtDecoded['sub']
+
+        userTasks = Task.query.filter_by(usuario_id=user_id).all()
 
         dictFiles = {
-            "listFilesUploaded": [],
-            "listFilesProcessed": []
+            "downloadFilesUploaded": [],
+            "downloadFilesProcessed": []
         }
 
         if userTasks:
-
             for userTask in userTasks:
-                if userTask.status == 1:
-                    dictFiles["listFilesUploaded"].append(userTask.fileName)
-                if userTask.status == 2:
-                    dictFiles["listFilesProcessed"].append(userTask.fileName)
-
+                if userTask.fileName == _filename and userTask.status==1:
+                    dictFiles["downloadFilesUploaded"].append("C:/audiofiles/"+userTask.fileName)
+                if userTask.fileName == _filename and userTask.status == 2:
+                    dictFiles["downloadFilesProcessed"].append("C:/audiofiles/"+userTask.fileName)
             return json.dumps(dictFiles)
-
         else:
-            return "El usuario no tiene documentos almacenados", 404
+            return "El usuario NO! tiene tareas", 404
+
 
 
 class VistaFiles(Resource):

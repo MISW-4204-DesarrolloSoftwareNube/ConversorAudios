@@ -29,6 +29,6 @@ api.add_resource(VistaLogIn, '/api/auth/login')
 api.add_resource(VistaTasks, '/api/tasks')
 api.add_resource(VistaTask, '/api/tasks/<int:id>')
 api.add_resource(VistaFiles, '/api/files')
-api.add_resource(VistaFileProcessedByUser, '/api/files/<int:id_user>')
+api.add_resource(VistaFileProcessedByUser, '/api/files/<string:_filename>')
 
 jwt = JWTManager(app)
