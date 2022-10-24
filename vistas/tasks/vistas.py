@@ -121,9 +121,7 @@ class VistaTask(Resource):
             return "Este archivo no se ha procesado"
 
     @jwt_required()
-    def delete(self):
-
-        id_tarea = request.json["id_tarea"]
+    def delete(self,id):
 
         strJwtRequest = request.headers['Authorization']
         parseJtwData = strJwtRequest[7:]
@@ -135,7 +133,7 @@ class VistaTask(Resource):
         userTasks = Task.query.filter_by(usuario_id=user_id).all()
 
         if userTasks:
-            userTask = Task.query.filter_by(id=id_tarea).first()
+            userTask = Task.query.filter_by(id=id).first()
             if userTask:
                 if userTask.status == 2:
                     db.session.delete(userTask)
@@ -144,7 +142,7 @@ class VistaTask(Resource):
                 else:
                     return 'La tarea no tiene estado PROCESSED', 404
             else:
-                return "El id {} de la tarea, NO existe para el usuario {}".format(id_tarea, user_id)
+                return "El id {} de la tarea, NO existe para el usuario {}".format(id, user_id)
         else:
             return "El usuario NO tiene tareas creadas", 404
 
@@ -152,7 +150,6 @@ class VistaTask(Resource):
 class VistaFileProcessedByUser(Resource):
     @jwt_required()
     def get(self, _filename):
-
 
         strJwtRequest = request.headers['Authorization']
         parseJtwData = strJwtRequest[7:]
