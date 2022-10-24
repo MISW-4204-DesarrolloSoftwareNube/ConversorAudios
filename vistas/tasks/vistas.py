@@ -62,39 +62,40 @@ class VistaTask(Resource):
     @jwt_required()
     def put(self, id):
 
-        task = Task.query.get_or_404(id)
+        strJwtRequest = request.headers['Authorization']
+        parseJtwData = strJwtRequest[7:]
+        jwtDecoded = jwt.decode(parseJtwData, options={
+                                "verify_signature": False})
+        user_id = jwtDecoded['sub']
 
-        if task.status == 2:
-            taskname = task.fileName
-            oldnewf = task.newFormat
-            oldnewformat = oldnewf.lower()
-            newfor = request.form.get("newFormat")
-            newformat = newfor.lower()
-            nombresol = [value for value in taskname.split(".")][0]
-            nombresolo = nombresol.lower()
-            oldnewname = nombresolo+'-'+str(id)+"."+oldnewformat
-            newname = nombresolo+'-'+str(id)+"."+newformat
+        task = Task.query.filter_by(usuario_id=user_id, id=id).first()
 
-            task.status = Status.UPLOADED
-            db.session.commit()
+        if (task):
 
-            origen = 'C:\\audiofiles\\' + oldnewname
-            print(origen)
-            destino = 'C:\\audiofiles\\' + newname
-            print(destino)
-            shutil.copy(origen, destino)
+            if task.status == 2:
+                taskname = task.fileName
+                oldnewf = task.newFormat
+                oldnewformat = oldnewf.lower()
+                nombresol = [value for value in taskname.split(".")][0]
+                nombresolo = nombresol.lower()
+                oldnewname = nombresolo+'-'+str(id)+"."+oldnewformat
 
-            task.newFormat = request.form.get("newFormat")
-            task.status = Status.PROCESSED
-            task.date = datetime.now()
-            db.session.commit()
+                task.status = Status.UPLOADED
+                task.newFormat = request.form.get("newFormat")
+                db.session.commit()
 
-            os.remove(origen)
+                origen = 'C:\\audiofiles\\' + oldnewname
+                print(origen)
+                os.remove(origen)
 
-            return "El archivo fue modificado correctamente"
+                return "La tarea ha sido actualizada correctamente"
+
+            else:
+                return "No se puede actualizar la tarea porque el archivo no se ha procesado"
 
         else:
-            return "Este archivo no se ha procesado"
+            return "El id {} de la tarea, NO existe para el usuario {}".format(id, user_id)
+
 
     @jwt_required()
     def delete(self,id):
