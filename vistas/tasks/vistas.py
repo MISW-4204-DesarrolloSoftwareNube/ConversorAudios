@@ -151,7 +151,6 @@ class VistaFileProcessedByUser(Resource):
     @jwt_required()
     def get(self, _filename):
 
-
         strJwtRequest = request.headers['Authorization']
         parseJtwData = strJwtRequest[7:]
 
