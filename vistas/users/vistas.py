@@ -31,7 +31,7 @@ class VistaSignUp(Resource):
             return "No se puede crear el usuario, el email ya está registrado", 409
 
         new_user = User(
-            username=request.json["username"], password=request.json["password1"], email=request.json["email"])
+            username=request.json["username"], password=request.json["password"], email=request.json["email"])
         db.session.add(new_user)
         db.session.commit()
         token_de_acceso = create_access_token(identity=new_user.id)
