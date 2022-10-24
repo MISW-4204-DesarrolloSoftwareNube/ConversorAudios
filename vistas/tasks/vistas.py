@@ -2,6 +2,8 @@
 from datetime import datetime
 import os
 import os.path
+import glob
+from pydub import AudioSegment
 from time import sleep
 from wsgiref import validate
 from flask import request
@@ -46,42 +48,67 @@ class VistaTasks(Resource):
 
 class VistaTask(Resource):
     
-    @jwt_required()
+    #@jwt_required()
     def get(self, id):
         return task_schema.dump(Task.query.get_or_404(id))
 
-    @jwt_required()
+    #@jwt_required()
     def put(self, id):
-        #obtener archivo
 
-        oldname = "nombrearchivo.mp3"
         task = Task.query.get_or_404(id)
         
-        if task.status == "PROCESSED":
-
-            nombresolo = oldname.split(".")[0]
-            format = request.json["newFormat"]
-            newname = nombresolo+"."+format
+        if task.status == 2:
+            oldname = task.fileName
+            oldnewf = task.newFormat
+            oldnewformat = oldnewf.lower()
+            newfor = request.form.get("newFormat")
+            newformat = newfor.lower()
+            namefile = [value for value in oldname.split("/")][-1]
+            nombresol = [value for value in namefile.split(".")][0]
+            nombresolo = nombresol.lower()
+            oldnewname = nombresolo+"."+oldnewformat
+            newname = nombresolo+"."+newformat
 
             task.status=Status.UPLOADED
             db.session.commit()
+            #obtener archivo
+            songs = glob.glob("*."+oldnewformat)
+            print(songs)
 
-            #convertir archivo
-            # src = oldname
-            # dst = newname
-                                                          
-            # sound = AudioSegment.from_mp3(src)
-            # sound.export(dst, format="wav")
+            for s in songs:
 
-            task.fileName=newname
-            task.newFormat=request.json["newFormat"]
-            task.status=Status.PROCESSED 
-            task.date=datetime.now()
-            db.session.commit()
+                song = s.lower()
 
-            #eliminar archivo anterior convertido
-        
-            return "El archivo fue modificado correctamente"
+                if(song == oldnewname):
+                #convertir archivo
+                    print("song",s)
+                    dst = newname
+
+                    print(song," y ",dst)
+
+                    # absolute_path = os.path.dirname(__file__)
+                    # print(absolute_path)
+
+                    # p = open("audio.mp3")
+                    # print("hola",p.re)
+                                    
+                    #sound = AudioSegment.from_file(absolute_path+"\\"+song, format=oldnewformat)
+                    #sound = AudioSegment.from_mp3(absolute_path+"\\audio.mp3")
+                    #print(sound)
+                    #sound.export(dst, format=newformat)
+
+                    task.newFormat=request.form.get("newFormat")
+                    task.status=Status.PROCESSED 
+                    task.date=datetime.now()
+                    db.session.commit()
+
+                #eliminar archivo anterior convertido
+
+                    return "El archivo fue modificado correctamente"
+
+                else:
+
+                    return "El archivo no fue encontrado", 400
 
         else:
             return "Este archivo no se ha procesado"
