@@ -2,7 +2,6 @@
 from datetime import datetime
 import os
 import os.path
-import glob
 from time import sleep
 from wsgiref import validate
 from flask import request
@@ -31,7 +30,8 @@ class VistaTasks(Resource):
                                 "verify_signature": False})
         user_id = jwtDecoded['sub']
 
-        fileName = request.files['fileName'].filename
+        fileN = request.files['fileName'].filename
+        fileName = fileN.lower()
         originalFormat = [
             value for value in fileName.split(".")][-1]
         name = [
@@ -65,57 +65,33 @@ class VistaTask(Resource):
         task = Task.query.get_or_404(id)
 
         if task.status == 2:
-            oldname = task.fileName
+            taskname = task.fileName
             oldnewf = task.newFormat
             oldnewformat = oldnewf.lower()
             newfor = request.form.get("newFormat")
             newformat = newfor.lower()
-            namefile = [value for value in oldname.split("/")][-1]
-            nombresol = [value for value in namefile.split(".")][0]
+            nombresol = [value for value in taskname.split(".")][0]
             nombresolo = nombresol.lower()
-            oldnewname = nombresolo+"."+oldnewformat
-            newname = nombresolo+"."+newformat
+            oldnewname = nombresolo+'-'+str(id)+"."+oldnewformat
+            newname = nombresolo+'-'+str(id)+"."+newformat
 
             task.status = Status.UPLOADED
             db.session.commit()
-            # obtener archivo
-            songs = glob.glob("*."+oldnewformat)
-            print(songs)
 
-            for s in songs:
+            origen = 'C:\\audiofiles\\' + oldnewname
+            print(origen)
+            destino = 'C:\\audiofiles\\' + newname
+            print(destino)
+            shutil.copy(origen, destino)
 
-                song = s.lower()
+            task.newFormat = request.form.get("newFormat")
+            task.status = Status.PROCESSED
+            task.date = datetime.now()
+            db.session.commit()
 
-                if (song == oldnewname):
-                    # convertir archivo
-                    print("song", s)
-                    dst = newname
+            os.remove(origen)
 
-                    print(song, " y ", dst)
-
-                    # absolute_path = os.path.dirname(__file__)
-                    # print(absolute_path)
-
-                    # p = open("audio.mp3")
-                    # print("hola",p.re)
-
-                    #sound = AudioSegment.from_file(absolute_path+"\\"+song, format=oldnewformat)
-                    #sound = AudioSegment.from_mp3(absolute_path+"\\audio.mp3")
-                    # print(sound)
-                    #sound.export(dst, format=newformat)
-
-                    task.newFormat = request.form.get("newFormat")
-                    task.status = Status.PROCESSED
-                    task.date = datetime.now()
-                    db.session.commit()
-
-                # eliminar archivo anterior convertido
-
-                    return "El archivo fue modificado correctamente"
-
-                else:
-
-                    return "El archivo no fue encontrado", 400
+            return "El archivo fue modificado correctamente"
 
         else:
             return "Este archivo no se ha procesado"
