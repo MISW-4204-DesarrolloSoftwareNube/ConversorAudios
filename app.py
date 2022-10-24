@@ -5,6 +5,7 @@ from flask_restful import Api
 
 from modelos import db
 from vistas.tasks import VistaTasks, VistaTask, VistaFileProcessedByUser
+from vistas.tasks.vistas import VistaFiles
 from vistas.users import VistaLogIn, VistaSignUp 
 
 app = Flask(__name__)
@@ -27,6 +28,7 @@ api.add_resource(VistaSignUp, '/api/auth/signup')
 api.add_resource(VistaLogIn, '/api/auth/login')
 api.add_resource(VistaTasks, '/api/tasks')
 api.add_resource(VistaTask, '/api/tasks/<int:id>')
+api.add_resource(VistaFiles, '/api/files')
 api.add_resource(VistaFileProcessedByUser, '/api/files/<int:id_user>')
 
 jwt = JWTManager(app)

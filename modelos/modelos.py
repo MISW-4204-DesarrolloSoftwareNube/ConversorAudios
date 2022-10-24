@@ -15,7 +15,6 @@ class User(db.Model):
     password = db.Column(db.String(50))
     email = db.Column(db.String(50))
     task = db.relationship('Task', cascade='all, delete, delete-orphan')
-    
 
 class Status(enum.IntEnum):
     UPLOADED = 1
@@ -29,8 +28,6 @@ class Task(db.Model):
     status = db.Column(db.Enum(Status))
     date = db.Column(db.DateTime(), default=datetime.now())
     usuario_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    
-    
 
 class UserSchema(SQLAlchemyAutoSchema):
     class Meta:

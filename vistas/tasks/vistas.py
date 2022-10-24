@@ -14,6 +14,7 @@ from sqlalchemy.exc import IntegrityError
 import requests
 import time
 import json
+import shutil
 
 from modelos import db
 from modelos.modelos import Status, TaskSchema, Task
@@ -171,5 +172,16 @@ class VistaFileProcessedByUser(Resource):
 
         else:
             return "El usuario no tiene documentos almacenados", 404
-        
 
+class VistaFiles(Resource):
+    #@jwt_required()
+    def post(self):
+        tasks = Task.query.filter_by(status=id_tarea).first()
+        """ dir_name = 'C:\\Users\\USER\\Documents\\audio.mp3'
+        f = open(dir_name, "w") """
+
+        #make a copy of the invoice to work with
+        src="C:\\Users\\USER\\Documents\\audio.mp3"
+        dst="C:\\Users\\USER\\Documents\\audio.wav"
+        shutil.copy(src,dst)
+        
