@@ -22,9 +22,16 @@ class VistaSignUp(Resource):
             User.username == request.json["username"]).first()
         if not user is None:
             return "No se puede crear el usuario, ya existe", 409
+        if request.json["password1"] != request.json["password2"]:
+            return "Las 2 contraseñas no coinciden", 409
+
+        user = User.query.filter(
+            User.email == request.json["email"]).first()
+        if not user is None:
+            return "No se puede crear el usuario, el email ya está registrado", 409
 
         new_user = User(
-            username=request.json["username"], password=request.json["password"])
+            username=request.json["username"], password=request.json["password1"], email=request.json["email"])
         db.session.add(new_user)
         db.session.commit()
         token_de_acceso = create_access_token(identity=new_user.id)
@@ -44,4 +51,3 @@ class VistaLogIn(Resource):
         token_de_acceso = create_access_token(identity=user.id)
         return {"mensaje": "Inicio de sesión exitoso", "token": token_de_acceso,
                 "User": user.username}
-

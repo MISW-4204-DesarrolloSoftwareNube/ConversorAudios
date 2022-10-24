@@ -23,15 +23,20 @@ task_schema = TaskSchema()
 
 class VistaTasks(Resource):
 
-    #@jwt_required
+    @jwt_required()
     def post(self):
+        strJwtRequest = request.headers['Authorization']
+        parseJtwData = strJwtRequest[7:]
+        jwtDecoded = jwt.decode(parseJtwData, options={"verify_signature": False})
+        user_id = jwtDecoded['sub']
+
         fileName = request.files['fileName'].filename
         originalFormat = [
             value for value in fileName.split(".")][-1]
         name = [
             value for value in fileName.split(".")][1]
         task = Task(fileName=fileName, originalFormat=originalFormat,
-                    newFormat=request.form.get("newFormat"), status=Status.UPLOADED, date=datetime.now())
+                    newFormat=request.form.get("newFormat"), status=Status.UPLOADED, date=datetime.now(), usuario_id = user_id)
         db.session.add(task)
         db.session.commit()
 
@@ -45,14 +50,13 @@ class VistaTasks(Resource):
     def get(self):
         return [task_schema.dump(ca) for ca in Task.query.all()]
 
-
 class VistaTask(Resource):
     
-    #@jwt_required()
+    @jwt_required()
     def get(self, id):
         return task_schema.dump(Task.query.get_or_404(id))
 
-    #@jwt_required()
+    @jwt_required()
     def put(self, id):
 
         task = Task.query.get_or_404(id)
@@ -113,6 +117,33 @@ class VistaTask(Resource):
         else:
             return "Este archivo no se ha procesado"
 
+    @jwt_required()
+    def delete(self):
+
+        id_tarea = request.json["id_tarea"]
+
+        strJwtRequest = request.headers['Authorization']
+        parseJtwData = strJwtRequest[7:]
+
+        jwtDecoded = jwt.decode(parseJtwData, options={"verify_signature": False})
+        user_id = jwtDecoded['sub']
+
+        userTasks = Task.query.filter_by(usuario_id=user_id).all()
+
+        if userTasks:            
+            userTask = Task.query.filter_by(id=id_tarea).first()
+            if userTask:
+                if userTask.status==2:        
+                    db.session.delete(userTask)
+                    db.session.commit()
+                    return 'Tarea eliminada con exito', 202
+                else:
+                    return 'La tarea no tiene estado PROCESSED', 404                
+            else:
+                return "El id {} de la tarea, NO existe para el usuario {}".format(id_tarea,user_id)
+        else:
+            return "El usuario NO tiene tareas creadas", 404
+
 class VistaFileProcessedByUser(Resource):
     @jwt_required()
     def get(self, id_user):
@@ -140,33 +171,5 @@ class VistaFileProcessedByUser(Resource):
 
         else:
             return "El usuario no tiene documentos almacenados", 404
-
-class VistaDeleteFile(Resource):
-    @jwt_required()
-    def delete(self):
-
-        id_tarea = request.json["id_tarea"]
-
-        strJwtRequest = request.headers['Authorization']
-        parseJtwData = strJwtRequest[7:]
-
-        jwtDecoded = jwt.decode(parseJtwData, options={"verify_signature": False})
-        user_id = jwtDecoded['sub']
-
-        userTasks = Task.query.filter_by(usuario_id=user_id).all()
-
-        if userTasks:            
-            userTask = Task.query.filter_by(id=id_tarea).first()
-            if userTask:
-                if userTask.status==2:        
-                    db.session.delete(userTask)
-                    db.session.commit()
-                    return 'Tarea eliminada con exito', 202
-                else:
-                    return 'La tarea no tiene estado PROCESSED', 404                
-            else:
-                return "El id {} de la tarea, NO existe para el usuario {}".format(id_tarea,user_id)
-        else:
-            return "El usuario NO tiene tareas creadas", 404
         
 
