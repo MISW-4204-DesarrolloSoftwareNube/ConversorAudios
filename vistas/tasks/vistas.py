@@ -35,7 +35,7 @@ class VistaTasks(Resource):
         originalFormat = [
             value for value in fileName.split(".")][-1]
         name = [
-            value for value in fileName.split(".")][1]
+            value for value in fileName.split(".")][0]
         task = Task(fileName=fileName, originalFormat=originalFormat,
                     newFormat=request.form.get("newFormat"), status=Status.UPLOADED, date=datetime.now(), usuario_id=user_id)
         db.session.add(task)
@@ -154,20 +154,25 @@ class VistaFileProcessedByUser(Resource):
 
 
 class VistaFiles(Resource):
-    @jwt_required()
     def post(self):
         tasks = Task.query.filter_by(status="UPLOADED").all()
         print(tasks)
+        if not tasks:
+            return "No hay archivos para procesar", 404
         for task in tasks:
             originalFormat = [value for value in task.fileName.split(".")][-1]
-            name = [value for value in task.fileName.split(".")][1]
+            name = [value for value in task.fileName.split(".")][0]
             origen = 'C:\\audiofiles\\' + name + '-' + \
                 str(task.id) + '.' + originalFormat
             print(origen)
             destino = 'C:\\audiofiles\\' + name + '-' + \
                 str(task.id) + '.' + task.newFormat
-            print(destino)
-            shutil.copy(origen, destino)
+            if os.path.isfile(origen):
+                print("Existe archivo -> " + origen)
+                shutil.copy(origen, destino)
 
-            task.status = Status.PROCESSED
-            db.session.commit()
+                task.status = Status.PROCESSED
+                db.session.commit()
+            else:
+                print("Archivo no existe -> " + origen)
+        return "archivos procesados correctamente"
