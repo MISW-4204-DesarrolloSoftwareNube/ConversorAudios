@@ -40,8 +40,10 @@ class VistaTasks(Resource):
                     newFormat=request.form.get("newFormat"), status=Status.UPLOADED, date=datetime.now(), usuario_id=user_id)
         db.session.add(task)
         db.session.commit()
-
+        
         dir_name = 'C:\\audiofiles\\'
+        if not os.path.exists(dir_name):
+            os.mkdir(dir_name)
         f = request.files['fileName']
         f.save(os.path.join(dir_name, name + '-' +
                str(task.id) + '.' + originalFormat))
