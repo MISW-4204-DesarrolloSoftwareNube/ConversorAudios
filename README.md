@@ -34,4 +34,4 @@ ConversorAudios/flask run -p 5000 -h 0.0.0.0
 ConversorAudios/micro1_batch/celery -A tasks worker -l info 
 
 
-3. Si desea ejecutar la tarea programada del Batch, se debe crear una tarea en Sistema operativo: Ver guia .pdf
+3. Si desea ejecutar la tarea programada del Batch, se debe crear una tarea en Sistema operativo: [Descargar Guia](https://uniandes-my.sharepoint.com/:b:/r/personal/g_castrot_uniandes_edu_co/Documents/QuintoBimestre2022/DesarrolloSoftwareNube/Semana2/Proyecto/manualEjecucionProyectoTareaProgramada.pdf?csf=1&web=1&e=jyOdbt)
