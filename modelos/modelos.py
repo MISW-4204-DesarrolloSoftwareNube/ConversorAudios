@@ -29,6 +29,15 @@ class Task(db.Model):
     date = db.Column(db.DateTime(), default=datetime.now())
     usuario_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
+
+class logBatch(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    procesDate = db.Column(db.DateTime(), default=datetime.now())
+    fileName = db.Column(db.String(50))
+    procesStatus = db.Column(db.String(50))
+    taskId = db.Column(db.Integer)
+    
+
 class UserSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = User
