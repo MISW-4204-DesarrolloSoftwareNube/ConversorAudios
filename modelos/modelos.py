@@ -9,7 +9,7 @@ from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 db = SQLAlchemy()
 
 
-class User(db.Model):
+class User_(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50))
     password = db.Column(db.String(50))
@@ -27,20 +27,20 @@ class Task(db.Model):
     newFormat = db.Column(db.String(3))
     status = db.Column(db.Enum(Status))
     date = db.Column(db.DateTime(), default=datetime.now())
-    usuario_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    usuario_id = db.Column(db.Integer, db.ForeignKey("user_.id"))
 
 
-class logBatch(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    procesDate = db.Column(db.DateTime(), default=datetime.now())
-    fileName = db.Column(db.String(50))
-    procesStatus = db.Column(db.String(50))
-    taskId = db.Column(db.Integer)
+# class logBatch(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     procesDate = db.Column(db.DateTime(), default=datetime.now())
+#     fileName = db.Column(db.String(50))
+#     procesStatus = db.Column(db.String(50))
+#     taskId = db.Column(db.Integer)
     
 
-class UserSchema(SQLAlchemyAutoSchema):
+class User_Schema(SQLAlchemyAutoSchema):
     class Meta:
-        model = User
+        model = User_
         load_instance = True
 
 class TaskSchema(SQLAlchemyAutoSchema):
