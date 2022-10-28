@@ -4,7 +4,9 @@ from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
 from modelos import db
-from vistas.vistas import VistaApiGateway, VistaLogIn, VistaSignIn
+from vistas.tasks import VistaTasks, VistaTask, VistaFileProcessedByUser
+from vistas.tasks.vistas import VistaFiles
+from vistas.users import VistaLogIn, VistaSignUp 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///conversorAudios.db'
@@ -22,7 +24,11 @@ cors = CORS(app)
 
 api = Api(app)
 
-api.add_resource(VistaSignIn, '/conversorAudios/signIn')
-api.add_resource(VistaLogIn, '/conversorAudios/logIn')
+api.add_resource(VistaSignUp, '/api/auth/signup')
+api.add_resource(VistaLogIn, '/api/auth/login')
+api.add_resource(VistaTasks, '/api/tasks')
+api.add_resource(VistaTask, '/api/tasks/<int:id>')
+api.add_resource(VistaFiles, '/api/files')
+api.add_resource(VistaFileProcessedByUser, '/api/files/<string:_filename>')
 
 jwt = JWTManager(app)
