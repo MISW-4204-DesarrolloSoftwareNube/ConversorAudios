@@ -15,7 +15,7 @@ import json
 import shutil
 
 from modelos import db
-from modelos.modelos import Status, TaskSchema, Task
+from modelos.modelos import Status, TaskSchema, Task, User_, User_Schema
 
 import smtplib, ssl
 from email.mime.text import MIMEText
@@ -177,10 +177,10 @@ class VistaFiles(Resource):
             if os.path.isfile(origen):
                 print("Existe archivo -> " + origen)
                 shutil.copy(origen, destino)
-
                 task.status = Status.PROCESSED
                 db.session.commit()
-                self.enviar_email('leonferrojavier@gmail.com')
+                user = User_.query.filter_by(id=task.usuario_id).first()
+                self.enviar_email(user.email)
             else:
                 print("Archivo no existe -> " + origen)
         return "archivos procesados correctamente"
