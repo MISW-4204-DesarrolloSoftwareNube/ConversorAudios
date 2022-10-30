@@ -17,6 +17,10 @@ import shutil
 from modelos import db
 from modelos.modelos import Status, TaskSchema, Task
 
+import smtplib, ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 task_schema = TaskSchema()
 
 
@@ -176,6 +180,41 @@ class VistaFiles(Resource):
 
                 task.status = Status.PROCESSED
                 db.session.commit()
+                self.enviar_email('leonferrojavier@gmail.com')
             else:
                 print("Archivo no existe -> " + origen)
         return "archivos procesados correctamente"
+
+    def enviar_email(self, receiver_email_):
+
+        sender_email = "conversor.grupo12@gmail.com"
+        receiver_email = receiver_email_
+        password = "dspleavntinppizy"
+
+        message = MIMEMultipart("alternative")
+        message["Subject"] = "multipart test"
+        message["From"] = sender_email
+        message["To"] = receiver_email
+
+        text = """\
+        Archivo procesado"""
+        html = """\
+        <html>
+              <body>
+            <h1> Archivo procesado con exito!!!
+            </h1>
+          </body>
+        </html>
+        """
+        part1 = MIMEText(text, "plain")
+        part2 = MIMEText(html, "html")
+
+        message.attach(part1)
+        message.attach(part2)
+
+        server = smtplib.SMTP('smtp.gmail.com:587')
+        server.starttls()
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message.as_string())
+
+        server.quit()
