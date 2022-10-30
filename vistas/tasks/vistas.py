@@ -41,7 +41,7 @@ class VistaTasks(Resource):
         db.session.add(task)
         db.session.commit()
         
-        dir_name = 'C:\\audiofiles\\'
+        dir_name = '/nfs/general/'
         if not os.path.exists(dir_name):
             os.mkdir(dir_name)
         f = request.files['fileName']
@@ -86,7 +86,7 @@ class VistaTask(Resource):
                 task.newFormat = request.form.get("newFormat")
                 db.session.commit()
 
-                origen = 'C:\\audiofiles\\' + oldnewname
+                origen = '/nfs/general/' + oldnewname
                 print(origen)
                 os.remove(origen)
 
@@ -147,9 +147,9 @@ class VistaFileProcessedByUser(Resource):
         if userTasks:
             for userTask in userTasks:
                 if userTask.fileName == _filename and userTask.status==1:
-                    dictFiles["downloadFilesUploaded"].append("C:/audiofiles/"+userTask.fileName)
+                    dictFiles["downloadFilesUploaded"].append("/nfs/general/"+userTask.fileName)
                 if userTask.fileName == _filename and userTask.status == 2:
-                    dictFiles["downloadFilesProcessed"].append("C:/audiofiles/"+userTask.fileName)
+                    dictFiles["downloadFilesProcessed"].append("/nfs/general/"+userTask.fileName)
             return json.dumps(dictFiles)
         else:
             return "El usuario NO! tiene tareas", 404
@@ -165,10 +165,10 @@ class VistaFiles(Resource):
         for task in tasks:
             originalFormat = [value for value in task.fileName.split(".")][-1]
             name = [value for value in task.fileName.split(".")][0]
-            origen = 'C:\\audiofiles\\' + name + '-' + \
+            origen = '/nfs/general/' + name + '-' + \
                 str(task.id) + '.' + originalFormat
             print(origen)
-            destino = 'C:\\audiofiles\\' + name + '-' + \
+            destino = '/nfs/general/' + name + '-' + \
                 str(task.id) + '.' + task.newFormat
             if os.path.isfile(origen):
                 print("Existe archivo -> " + origen)
