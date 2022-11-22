@@ -21,11 +21,9 @@ import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-from google.cloud.storage import Blob
-from google.cloud import storage
 
-from google.cloud import pubsub_v1
-
+from os import path
+from pydub import AudioSegment
 
 task_schema = TaskSchema()
 user_schema = User_Schema()
@@ -35,15 +33,6 @@ class VistaTasks(Resource):
 
     @jwt_required()
     def post(self):
-
-        # Codigo para enviar mensaje al Sub
-        credential_path = '/home/ConversorAudios/vistas/tasks/pub_sub_key.json'
-        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
-        publisher = pubsub_v1.PublisherClient()
-        topic_path = 'projects/proyectouniandescoversor/topics/topic-conversor'
-
-
-
         strJwtRequest = request.headers['Authorization']
         parseJtwData = strJwtRequest[7:]
         jwtDecoded = jwt.decode(parseJtwData, options={
@@ -61,33 +50,12 @@ class VistaTasks(Resource):
         db.session.add(task)
         db.session.commit()
         
-        dir_name = '/home/RepositorioAudiosLocal/'
+        dir_name = '/nfs/general/'
         if not os.path.exists(dir_name):
             os.mkdir(dir_name)
         f = request.files['fileName']
-        nameFile = name + '-' + str(task.id) + '.' + originalFormat
-        f.save(os.path.join(dir_name, nameFile))
-
-        client = storage.Client('ProyectoUniandesConversor')
-        bucket = client.get_bucket('bucketproyectoaudiosv1')
-        print("Mensaje: ", bucket)
-        blob = Blob(nameFile, bucket)
-        blob.upload_from_filename(dir_name + nameFile,'/')
-        os.remove(dir_name + nameFile)
-        #blob = Blob('pruebas5.txt', bucket)
-
-        #blob.upload_from_filename('/home/gcastro0102/pruebabucket/pruebas5.txt','/')
-
-
-        blob.make_public()
-
-
-        data = str(task.id)
-        data = data.encode('utf-8')
-        future = publisher.publish(topic_path,data)
-
-        print(f'published message id {future.result()}')
-
+        f.save(os.path.join(dir_name, name + '-' +
+               str(task.id) + '.' + originalFormat))
 
         return "La tarea fue creada correctamente"
 
@@ -126,14 +94,10 @@ class VistaTask(Resource):
                 task.status = Status.UPLOADED
                 task.newFormat = request.form.get("newFormat")
                 db.session.commit()
-                client = storage.Client('ProyectoUniandesConversor')
-                bucket = client.get_bucket('bucketproyectoaudiosv1')
-                blob = bucket.blob(oldnewname)
-                blob.delete()
 
-                #origen = '/nfs/general/' + oldnewname
-                #print(origen)
-                #os.remove(origen)
+                origen = '/nfs/general/' + oldnewname
+                print(origen)
+                os.remove(origen)
 
                 return "La tarea ha sido actualizada correctamente"
 
@@ -156,28 +120,12 @@ class VistaTask(Resource):
 
         userTasks = Task.query.filter_by(usuario_id=user_id).all()
 
-        client = storage.Client('ProyectoUniandesConversor')
-        bucket = client.get_bucket('bucketproyectoaudiosv1')
         if userTasks:
             userTask = Task.query.filter_by(id=id).first()
-
             if userTask:
-                originalF = userTask.originalFormat
-                sourceFormat = originalF.lower()
-             
-                newF = userTask.newFormat
-                lastFormat = newF.lower()
-                name = [value for value in userTask.fileName.split(".")][0]
-                nameold = name + '-' + str(userTask.id) + '.' + sourceFormat
-                namenew = name + '-' + str(userTask.id) + '.' + lastFormat
                 if userTask.status == 2:
                     db.session.delete(userTask)
                     db.session.commit()
-                    blobs = []
-                    blobs.append(bucket.blob(nameold))
-                    blobs.append(bucket.blob(namenew))
-                    for blob in blobs:
-                        blob.delete()
                     return 'Tarea eliminada con exito', 202
                 else:
                     return 'La tarea no tiene estado PROCESSED', 404
@@ -219,8 +167,6 @@ class VistaFileProcessedByUser(Resource):
 
 class VistaFiles(Resource):
     def post(self):
-
-
         tasks = Task.query.filter_by(status="UPLOADED").all()
         print(tasks)
         if not tasks:
@@ -228,27 +174,16 @@ class VistaFiles(Resource):
         for task in tasks:
             originalFormat = [value for value in task.fileName.split(".")][-1]
             name = [value for value in task.fileName.split(".")][0]
-            
-            client = storage.Client('ProyectoUniandesConversor')
-            bucket = client.get_bucket('bucketproyectoaudiosv1')
-            origen = name + '-' + str(task.id) + '.' + originalFormat
+            origen = '/nfs/general/' + name + '-' + \
+                str(task.id) + '.' + originalFormat
             print(origen)
-            destino = name + '-' + str(task.id) + '.' + task.newFormat
-            
-            source_blob = bucket.blob(origen)
-            #destination_bucket = client.Bucket
-
-            blob_copy = bucket.copy_blob(source_blob, bucket, destino)
-            
-            task.status = Status.PROCESSED
-            db.session.commit()
-
-            user = User_.query.filter_by(id=task.usuario_id).first()
-
-            self.enviar_email(user.email)
-            """ if os.path.isfile(origen):
+            destino = '/nfs/general/' + name + '-' + \
+                str(task.id) + '.' + task.newFormat
+            if os.path.isfile(origen):
                 print("Existe archivo -> " + origen)
-                shutil.copy(origen, destino)
+                #shutil.copy(origen, destino)
+                sound = AudioSegment.from_mp3(origen)
+                sound.export(destino, format="wav")
 
                 task.status = Status.PROCESSED
                 db.session.commit()
@@ -259,7 +194,7 @@ class VistaFiles(Resource):
                 
                 self.enviar_email(user.email)
             else:
-                print("Archivo no existe -> " + origen)"""
+                print("Archivo no existe -> " + origen)
         return "archivos procesados correctamente"
 
     def enviar_email(self, receiver_email_):

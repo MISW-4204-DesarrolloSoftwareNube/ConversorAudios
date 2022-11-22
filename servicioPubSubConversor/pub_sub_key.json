@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "proyectouniandescoversor",
+  "private_key_id": "38069457fee086306b0157ee30406a19ad0f5057",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCb4QiheJy2V4+/\noAkPLp/GfzLkQ2y8nCxBPMUZkP1tz1pJYEgoX+2kxmOWOfk7xKtoHrI5WdyzVkvT\nPJTDWr6iTeA4NYMpdwKDKwlFTvEOI81c+vXUMmrZcXblPDYU2lhLNT/meesHmCSH\nkDkpWWfHEJqUQYguhnsJ6+SsneJYATcxTsBsxi8lMhebPhSBDGAHIlmK/ZA7UUEK\negTC8tYf/odgrbGmdc4QMlSbdaUhl4/n1HwbjWTnrb/tNAonppMJXMQLY4kvCqP5\nwTNTXaBdWOqb3PgrRUpNiL/x6XAyDhke2aaDS5fCZNELaxR9OfNDYAgHyRcykUK4\nPVmPHBgdAgMBAAECggEAFVGCf6riK+Hvy/JUKtpiiaAt0qASB/2H4+guwJ9euZzp\nKS3c0IDGHInxZsNI/c6Y7qV8FHHgyDoeJqabZdhMSCBEcQuIg6w+ELhbDTqNpzRo\nSrYb1siKanClJRbGArYV6zs+IQQ9i41YOZ4U4z3R/pybt3j66foEa8fyP1VcdlKF\na6bOtpxSmIbn1al4DsIwaJo4XPqk2TYnvbo8cWufF757nBqmPf0dX30xQLpUIoHw\nLc6tjipl2cGsla8nO4aX2aagWPeBZE45M4Y9x5/Dez5cFE8scKWo0yI7/g+7KGa5\n8mtU7YgDNMGjran/q4bLQBat6sqAZ5S94/5wIsF6gQKBgQDYeQLDVA0zdhRjplDk\nMK8lkrq5MaLlFTP1rXg1vme8mCfZi+L6WIG+JSnIrN7MqzJCOkbfXIEtLzQVnEpn\nKC6lUqCbnlzQSRB/Cl3AZ3X2MZD/7HuLHlLGH9vXZPc/etb70RTytfmaZYaSh81X\nNz7tRZ+1qk7/X1qzK9KS9CK3IQKBgQC4V5Rwj2y3kXupQiYtetQgaYiH1lc3rWlx\nEX16BwbCCQHpXa51XZEHIeJz0/tF4z4uwLGXAoMeyBy3Gf7jnTErixQvhVYrzuGu\nS9vxVxUEmQGLnLGihgSrDpkyddGfnhzbLcy34+oW0Wer5bxDL1in03tQ7HIXFIBZ\n42g651wNfQKBgAtkavHOpZc0uqP357/qk/0dOLhwVUtLD135kB7780eolkhLpVlZ\neRKBsC5AcsVAqTd1C6/LlXzERDBy9jNxmOrYa11lOys2/ShCamaqyzl2qFPfpSzQ\nHrkQiihOxvhPRasg+MJBM26dszRY80SIwsYH6PzNhrTH1uUhBEb5lC4hAoGAMRyE\nG4jaef10aJ+K9ErpAMmc6jOcgOTeVpVGTKBamI81xyqCNBp9bN0GK72qD/B+vI3x\nwj2VGTpPDCkM0y8pzmP7OL3ZO0qerYTgT+fXXaY11zAj0xzJWZlGDz98XX4OSgZl\nqAg8cV/Qsuc9xNh0UiHxlJmpu6RmnYwMVMUWrTECgYEAnlwntPdXJ/Vc+WT9ofwm\n8hD7dBYuml/iQINLpiA60E+gsREdNaoNKMdiGBCQVvXvgX3j44+yZ0yrCGvsgraq\nRoziVU4m/h8sqDwrRrrbL3NYW9SHhzrRa44TG4oxHUi6vO/TB9B/HLXMspYBfjrF\n9YB98KGhhXwuJJNn1nmq/jo=\n-----END PRIVATE KEY-----\n",
+  "client_email": "serviceaccountpubsub@proyectouniandescoversor.iam.gserviceaccount.com",
+  "client_id": "107447256370362475093",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/serviceaccountpubsub%40proyectouniandescoversor.iam.gserviceaccount.com"
+}
