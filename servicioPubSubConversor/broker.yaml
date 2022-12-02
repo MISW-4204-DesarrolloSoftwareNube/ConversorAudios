@@ -1,0 +1,8 @@
+runtime: custom
+env: flex
+entrypoint: gunicorn -b:5005 app:app
+
+
+env_variables:
+  GOOGLE_APPLICATION_CREDENTIALS: "pub_sub_key.json"
+
