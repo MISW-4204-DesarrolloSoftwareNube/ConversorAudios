@@ -37,8 +37,10 @@ class VistaTasks(Resource):
     def post(self):
 
         # Codigo para enviar mensaje al Sub
-        credential_path = '/home/ConversorAudios/vistas/tasks/pub_sub_key.json'
-        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
+        #credential_path = ''
+
+        #os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credential_path
+        #os.environ['GOOGLE_APPLICATION_CREDENTIALS']
         publisher = pubsub_v1.PublisherClient()
         topic_path = 'projects/proyectouniandescoversor/topics/topic-conversor'
 
